@@ -363,7 +363,7 @@ int speech_channel_destroy(speech_channel_t *schannel)
 		ast_log(LOG_DEBUG, "(%s) Waiting for MRCP session to terminate\n", schannel->name);
 		if (schannel->state != SPEECH_CHANNEL_CLOSED) {
 			if (schannel->cond != NULL) {
-				if (apr_thread_cond_timedwait(schannel->cond, schannel->mutex, globals.speech_channel_timeout) == APR_TIMEUP) {
+				if ((apr_thread_cond_timedwait(schannel->cond, schannel->mutex, globals.speech_channel_timeout) == APR_TIMEUP) && (schannel->state != SPEECH_CHANNEL_CLOSED)) {
 					ast_log(LOG_WARNING, "(%s) MRCP session has not terminated after %" APR_TIME_T_FMT " ms\n", schannel->name, apr_time_as_msec(globals.speech_channel_timeout));
 				}
 			}
