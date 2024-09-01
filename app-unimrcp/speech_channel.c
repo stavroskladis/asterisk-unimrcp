@@ -491,7 +491,7 @@ int speech_channel_open(speech_channel_t *schannel, ast_mrcp_profile_t *profile)
 	}
 
 	/* Wait for channel to be ready. */
-	while (schannel->state == SPEECH_CHANNEL_CLOSED)
+	if (schannel->state == SPEECH_CHANNEL_CLOSED)
 		apr_thread_cond_timedwait(schannel->cond, schannel->mutex, globals.speech_channel_timeout);
 
 	if (schannel->state == SPEECH_CHANNEL_READY) {
