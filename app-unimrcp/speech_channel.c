@@ -154,12 +154,12 @@ int speech_channel_bargeinoccurred(speech_channel_t *schannel)
 			ast_log(LOG_ERROR, "(%s) Failed to create BARGE_IN_OCCURRED message\n", schannel->name);
 			status = -1;
 		} else {
-			if (!mrcp_application_message_send(schannel->unimrcp_session, schannel->unimrcp_channel, mrcp_message))
+			if (!mrcp_application_message_send(schannel->unimrcp_session, schannel->unimrcp_channel, mrcp_message)) {
 				ast_log(LOG_WARNING, "(%s) [speech_channel_bargeinoccurred] Failed to send BARGE_IN_OCCURRED message\n", schannel->name);
-			else if (schannel->cond != NULL) {
+			} else if (schannel->cond != NULL) {
 				if (schannel->state == SPEECH_CHANNEL_PROCESSING) {
-					if (apr_thread_cond_timedwait(schannel->cond, schannel->mutex, globals.speech_channel_timeout) == APR_TIMEUP) {
-						break;
+					if ((apr_thread_cond_timedwait(schannel->cond, schannel->mutex, globals.speech_channel_timeout) == APR_TIMEUP) && (schannel->state == SPEECH_CHANNEL_PROCESSING)) {
+						ast_log(LOG_WARNING, "(%s) [speech_channel_bargeinoccurred] MRCP session has not closed after %" APR_TIME_T_FMT " ms\n", schannel->name, apr_time_as_msec(globals.speech_channel_timeout));
 					}
 				}
 			}
@@ -574,18 +574,18 @@ int speech_channel_stop(speech_channel_t *schannel)
 			ast_log(LOG_ERROR, "(%s) Failed to create STOP message\n", schannel->name);
 			status = -1;
 		} else {
-			if (!mrcp_application_message_send(schannel->unimrcp_session, schannel->unimrcp_channel, mrcp_message))
+			if (!mrcp_application_message_send(schannel->unimrcp_session, schannel->unimrcp_channel, mrcp_message)) {
 				ast_log(LOG_WARNING, "(%s) Failed to send STOP message\n", schannel->name);
-			else if (schannel->cond != NULL) {
+			} else if (schannel->cond != NULL) {
 				if (schannel->state == SPEECH_CHANNEL_PROCESSING) {
-					if (apr_thread_cond_timedwait(schannel->cond, schannel->mutex, globals.speech_channel_timeout) == APR_TIMEUP) {
-						break;
+					if ((apr_thread_cond_timedwait(schannel->cond, schannel->mutex, globals.speech_channel_timeout) == APR_TIMEUP) && (schannel->state == SPEECH_CHANNEL_PROCESSING)) {
+						ast_log(LOG_WARNING, "(%s) MRCP session has not closed after %" APR_TIME_T_FMT " ms\n", schannel->name, apr_time_as_msec(globals.speech_channel_timeout));
 					}
 				}
 			}
 
 			if (schannel->state == SPEECH_CHANNEL_PROCESSING) {
-				ast_log(LOG_ERROR, "(%s) Timed out waiting for session to close.  Continuing\n", schannel->name);
+				ast_log(LOG_ERROR, "(%s) Timed out waiting for session to close. Continuing\n", schannel->name);
 				schannel->state = SPEECH_CHANNEL_ERROR;
 				status = -1;
 			} else if (schannel->state == SPEECH_CHANNEL_ERROR) {
