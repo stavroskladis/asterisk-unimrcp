@@ -46,7 +46,7 @@
 #define DEFAULT_UNIMRCP_OFFER_NEW_CONNECTION   1
 #define DEFAULT_UNIMRCP_LOG_LEVEL              "DEBUG"
 
-#define DEFAULT_SPEECH_CHANNEL_TIMEOUT         apr_time_from_msec(30000)
+#define DEFAULT_SPEECH_CHANNEL_TIMEOUT         apr_time_from_msec(2000)
 
 #define DEFAULT_LOCAL_IP_ADDRESS               "127.0.0.1"
 #define DEFAULT_REMOTE_IP_ADDRESS              "127.0.0.1"
